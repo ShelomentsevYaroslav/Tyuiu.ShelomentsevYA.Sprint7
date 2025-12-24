@@ -9,6 +9,84 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icons\add.png" />
+    <None Remove="Icons\arrow_refresh.png" />
+    <None Remove="Icons\author.jpg" />
+    <None Remove="Icons\chart_bar.png" />
+    <None Remove="Icons\chart_line.png" />
+    <None Remove="Icons\cross.png" />
+    <None Remove="Icons\delete.png" />
+    <None Remove="Icons\desktop.ini" />
+    <None Remove="Icons\disk.png" />
+    <None Remove="Icons\door_out.png" />
+    <None Remove="Icons\folder.png" />
+    <None Remove="Icons\folder_table.png" />
+    <None Remove="Icons\help.png" />
+    <None Remove="Icons\information.png" />
+    <None Remove="Icons\page_white_excel.png" />
+    <None Remove="Icons\page_white_text.png" />
+    <None Remove="Icons\pencil.png" />
+    <None Remove="Images\author.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icons\add.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\arrow_refresh.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\author.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\chart_bar.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\chart_line.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\cross.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\delete.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\desktop.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\disk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\door_out.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\folder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\folder_table.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\help.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\information.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\page_white_excel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\page_white_text.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\pencil.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\author.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tyuiu.ShelomentsevYA.Sprint7.V11.Lib\Tyuiu.ShelomentsevYA.Sprint7.Project.V11.Lib.csproj" />
   </ItemGroup>
 

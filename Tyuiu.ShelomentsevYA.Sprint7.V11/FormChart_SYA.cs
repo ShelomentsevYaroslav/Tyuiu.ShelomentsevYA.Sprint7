@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -6,74 +7,227 @@ using System.Windows.Forms;
 
 namespace Tyuiu.ShelomentsevYA.Sprint7.V11
 {
-    public class FormChart_SYA : Form
+    public sealed class FormChart_SYA : Form
     {
-        private readonly DataTable table_SYA;
+        internal sealed class DeptStat_SYA
+        {
+            public string Name { get; init; } = "—";
+            public int Count { get; init; }
+            public double AvgSalary { get; init; }
+            public double SumSalary { get; init; }
+        }
+
+        private readonly List<DeptStat_SYA> stats_SYA;
+
+        // ===== CONST UI =====
+        private const int MarginOuter = 34;
+        private const int Gap = 26;
 
         public FormChart_SYA(DataTable table)
         {
-            table_SYA = table;
-
-            Text = "Гистограмма окладов сотрудников";
-            ClientSize = new Size(900, 500);
-            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Аналитика по подразделениям";
+            WindowState = FormWindowState.Maximized;
+            BackColor = Color.White;
             DoubleBuffered = true;
 
-            Paint += FormChart_SYA_Paint;
+            stats_SYA = BuildStatistics(table);
         }
 
-        private void FormChart_SYA_Paint(object sender, PaintEventArgs e)
+        // ===== DATA =====
+
+        private static List<DeptStat_SYA> BuildStatistics(DataTable? table)
         {
-            if (table_SYA == null || table_SYA.Rows.Count == 0)
-                return;
+            if (table == null)
+                return new();
 
-            Graphics g = e.Graphics;
+            if (!table.Columns.Contains("Подразделение") ||
+                !table.Columns.Contains("Оклад"))
+                return new();
 
-            var data = table_SYA.AsEnumerable()
-                .Select(r => new
+            return table.AsEnumerable()
+                .Select(r =>
                 {
-                    Name = r["Фамилия"].ToString(),
-                    Salary = double.TryParse(r["Оклад"].ToString(), out double v) ? v : 0
+                    bool ok = double.TryParse(r["Оклад"]?.ToString(), out double salary);
+                    return new { Row = r, Ok = ok, Salary = salary };
                 })
-                .Where(x => x.Salary > 0)
+                .Where(x => x.Ok)
+                .GroupBy(x => x.Row["Подразделение"]?.ToString() ?? "—")
+                .Select(g => new DeptStat_SYA
+                {
+                    Name = g.Key,
+                    Count = g.Count(),
+                    AvgSalary = g.Average(x => x.Salary),
+                    SumSalary = g.Sum(x => x.Salary)
+                })
+                .OrderByDescending(x => x.AvgSalary)
                 .ToList();
+        }
 
-            if (data.Count == 0)
-                return;
+        // ===== PAINT =====
 
-            int margin = 60;
-            int chartHeight = ClientSize.Height - margin * 2;
-            int chartWidth = ClientSize.Width - margin * 2;
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
 
-            double maxSalary = data.Max(x => x.Salary);
-            int barWidth = chartWidth / data.Count;
-
-            Pen axisPen = Pens.Black;
-            Brush barBrush = Brushes.SteelBlue;
-            Font labelFont = new Font("Segoe UI", 9);
-
-            // Оси
-            g.DrawLine(axisPen, margin, margin, margin, margin + chartHeight);
-            g.DrawLine(axisPen, margin, margin + chartHeight, margin + chartWidth, margin + chartHeight);
-
-            for (int i = 0; i < data.Count; i++)
+            if (stats_SYA.Count == 0)
             {
-                int barHeight = (int)(chartHeight * data[i].Salary / maxSalary);
+                DrawEmptyMessage(e.Graphics);
+                return;
+            }
 
-                int x = margin + i * barWidth + 5;
-                int y = margin + chartHeight - barHeight;
+            var layout = CalculateLayout(ClientSize);
 
-                g.FillRectangle(barBrush, x, y, barWidth - 10, barHeight);
-                g.DrawRectangle(Pens.Black, x, y, barWidth - 10, barHeight);
+            DrawBarChart(e.Graphics, layout.AvgRect, stats_SYA, s => s.AvgSalary,
+                "Средний оклад по подразделениям");
 
-                g.DrawString(
-                    data[i].Name,
+            DrawBarChart(e.Graphics, layout.CountRect, stats_SYA, s => s.Count,
+                "Количество сотрудников");
+
+            DrawBarChart(e.Graphics, layout.SumRect, stats_SYA, s => s.SumSalary,
+                "Фонд оплаты труда");
+        }
+
+        // ===== LAYOUT =====
+
+        private static (Rectangle AvgRect, Rectangle CountRect, Rectangle SumRect)
+            CalculateLayout(Size size)
+        {
+            int topRowHeight = (size.Height - MarginOuter * 3 - Gap) / 2;
+
+            Rectangle avg = new(
+                MarginOuter,
+                MarginOuter + 18,
+                (size.Width - MarginOuter * 2 - Gap) / 2,
+                topRowHeight
+            );
+
+            Rectangle count = new(
+                avg.Right + Gap,
+                avg.Top,
+                avg.Width,
+                avg.Height
+            );
+
+            Rectangle sum = new(
+                MarginOuter,
+                avg.Bottom + MarginOuter,
+                size.Width - MarginOuter * 2,
+                topRowHeight
+            );
+
+            return (avg, count, sum);
+        }
+
+        // ===== DRAW =====
+
+        private static void DrawEmptyMessage(Graphics g)
+        {
+            using Font f = new("Segoe UI", 14, FontStyle.Italic);
+            g.DrawString(
+                "Недостаточно данных для построения диаграммы",
+                f,
+                Brushes.Gray,
+                40,
+                40
+            );
+        }
+
+        private static void DrawBarChart(
+            Graphics g,
+            Rectangle area,
+            List<DeptStat_SYA> data,
+            Func<DeptStat_SYA, double> selector,
+            string title)
+        {
+            using Font titleFont = new("Segoe UI", 11, FontStyle.Bold);
+            using Font labelFont = new("Segoe UI", 8);
+            using Font valueFont = new("Segoe UI", 7);
+            using Brush barBrush = new SolidBrush(Color.FromArgb(90, 140, 200));
+
+            g.DrawString(title, titleFont, Brushes.Black, area.Left, area.Top - 26);
+
+            double maxValue = data.Max(selector);
+            if (maxValue <= 0) return;
+
+            const int innerTop = 10;
+            const int innerBottom = 58;
+
+            int plotLeft = area.Left + 4;
+            int plotRight = area.Right - 4;
+            int plotTop = area.Top + innerTop;
+            int plotBottom = area.Bottom - innerBottom;
+
+            int plotWidth = plotRight - plotLeft;
+            int plotHeight = plotBottom - plotTop;
+            if (plotWidth <= 0 || plotHeight <= 0) return;
+
+            int n = data.Count;
+            int barSpacing = 10;
+            int barWidth = Math.Max(18, plotWidth / n - barSpacing);
+
+            for (int i = 0; i < n; i++)
+            {
+                DrawBar(
+                    g,
+                    data[i],
+                    selector,
+                    maxValue,
+                    plotLeft,
+                    plotBottom,
+                    plotHeight,
+                    barWidth,
+                    barSpacing,
+                    i,
+                    barBrush,
                     labelFont,
-                    Brushes.Black,
-                    x,
-                    margin + chartHeight + 5
+                    valueFont
                 );
             }
+        }
+
+        private void InitializeComponent()
+        {
+
+        }
+
+        private static void DrawBar(
+            Graphics g,
+            DeptStat_SYA item,
+            Func<DeptStat_SYA, double> selector,
+            double maxValue,
+            int plotLeft,
+            int plotBottom,
+            int plotHeight,
+            int barWidth,
+            int spacing,
+            int index,
+            Brush brush,
+            Font labelFont,
+            Font valueFont)
+        {
+            double value = selector(item);
+            int barHeight = (int)(value / maxValue * plotHeight);
+
+            int x = plotLeft + index * (barWidth + spacing);
+            int y = plotBottom - barHeight;
+
+            g.FillRectangle(brush, x, y, barWidth, barHeight);
+            g.DrawRectangle(Pens.Black, x, y, barWidth, barHeight);
+
+            g.DrawString(
+                value.ToString("N0"),
+                valueFont,
+                Brushes.Black,
+                x + barWidth / 2,
+                y - 12,
+                new StringFormat { Alignment = StringAlignment.Center }
+            );
+
+            g.TranslateTransform(x + barWidth / 2, plotBottom + 6);
+            g.RotateTransform(-35);
+            g.DrawString(item.Name, labelFont, Brushes.Black, 0, 0,
+                new StringFormat { Alignment = StringAlignment.Far });
+            g.ResetTransform();
         }
     }
 }

@@ -2,68 +2,68 @@
 {
     partial class FormMain
     {
-        private System.ComponentModel.IContainer components = null;
+        private System.ComponentModel.IContainer components;
 
         private System.Windows.Forms.MenuStrip menuStripMain_SYA;
         private System.Windows.Forms.ToolStrip toolStripMain_SYA;
         private System.Windows.Forms.DataGridView dataGridViewEmployees_SYA;
-        private System.Windows.Forms.ToolTip toolTipMain_SYA;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBoxTables_SYA;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBoxSearch_SYA;
 
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemFile_SYA;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemOpenCsv_SYA;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemOpenFolder_SYA;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSaveCsv_SYA;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemExit_SYA;
+
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemHelp_SYA;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemUserGuide_SYA;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemAbout_SYA;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-                components.Dispose();
-            base.Dispose(disposing);
-        }
-
-        #region Windows Form Designer generated code
 
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
 
-            menuStripMain_SYA = new MenuStrip();
-            toolStripMain_SYA = new ToolStrip();
-            dataGridViewEmployees_SYA = new DataGridView();
-            toolTipMain_SYA = new ToolTip(components);
+            menuStripMain_SYA = new();
+            toolStripMain_SYA = new();
+            dataGridViewEmployees_SYA = new();
+            toolStripComboBoxTables_SYA = new();
+            toolStripTextBoxSearch_SYA = new();
+            toolStripComboBoxTables_SYA.SelectedIndexChanged += Tables_SelectedIndexChanged;
 
-            toolStripMenuItemFile_SYA = new ToolStripMenuItem();
-            toolStripMenuItemOpenCsv_SYA = new ToolStripMenuItem();
-            toolStripMenuItemSaveCsv_SYA = new ToolStripMenuItem();
-            toolStripMenuItemExit_SYA = new ToolStripMenuItem();
-            toolStripMenuItemHelp_SYA = new ToolStripMenuItem();
-            toolStripMenuItemUserGuide_SYA = new ToolStripMenuItem();
-            toolStripMenuItemAbout_SYA = new ToolStripMenuItem();
 
-            ((System.ComponentModel.ISupportInitialize)dataGridViewEmployees_SYA).BeginInit();
-            SuspendLayout();
+            toolStripMenuItemFile_SYA = new();
+            toolStripMenuItemOpenCsv_SYA = new();
+            toolStripMenuItemOpenFolder_SYA = new();
+            toolStripMenuItemSaveCsv_SYA = new();
+            toolStripMenuItemExit_SYA = new();
+
+            toolStripMenuItemHelp_SYA = new();
+            toolStripMenuItemUserGuide_SYA = new();
+            toolStripMenuItemAbout_SYA = new();
 
             // ===== MENU =====
-            menuStripMain_SYA.Items.AddRange(new ToolStripItem[]
+            menuStripMain_SYA.Items.AddRange(new[]
             {
                 toolStripMenuItemFile_SYA,
                 toolStripMenuItemHelp_SYA
             });
 
             toolStripMenuItemFile_SYA.Text = "Файл";
-            toolStripMenuItemFile_SYA.DropDownItems.AddRange(new ToolStripItem[]
+            toolStripMenuItemFile_SYA.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[]
             {
                 toolStripMenuItemOpenCsv_SYA,
+                toolStripMenuItemOpenFolder_SYA,
                 toolStripMenuItemSaveCsv_SYA,
-                new ToolStripSeparator(),
+                new System.Windows.Forms.ToolStripSeparator(),
                 toolStripMenuItemExit_SYA
             });
 
             toolStripMenuItemOpenCsv_SYA.Text = "Открыть CSV";
             toolStripMenuItemOpenCsv_SYA.Click += OpenCsv_Click;
+
+            toolStripMenuItemOpenFolder_SYA.Text = "Открыть папку CSV";
+            toolStripMenuItemOpenFolder_SYA.Click += OpenFolder_Click;
 
             toolStripMenuItemSaveCsv_SYA.Text = "Сохранить CSV";
             toolStripMenuItemSaveCsv_SYA.Click += SaveCsv_Click;
@@ -72,7 +72,7 @@
             toolStripMenuItemExit_SYA.Click += Exit_Click;
 
             toolStripMenuItemHelp_SYA.Text = "Справка";
-            toolStripMenuItemHelp_SYA.DropDownItems.AddRange(new ToolStripItem[]
+            toolStripMenuItemHelp_SYA.DropDownItems.AddRange(new[]
             {
                 toolStripMenuItemUserGuide_SYA,
                 toolStripMenuItemAbout_SYA
@@ -84,47 +84,53 @@
             toolStripMenuItemAbout_SYA.Text = "О программе";
             toolStripMenuItemAbout_SYA.Click += About_Click;
 
-            // ===== TOOLSTRIP BUTTONS =====
-            var buttonSearch_SYA = new ToolStripButton("Поиск");
-            buttonSearch_SYA.Click += Search_Click;
+            // ===== TOOLSTRIP =====
+            toolStripMain_SYA.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            toolStripMain_SYA.AutoSize = false;
+            toolStripMain_SYA.Height = 46;
 
-            var buttonAdd_SYA = new ToolStripButton("Добавить");
-            buttonAdd_SYA.Click += Add_Click;
-
-            var buttonEdit_SYA = new ToolStripButton("Изменить");
-            buttonEdit_SYA.Click += Edit_Click;
-
-            var buttonDelete_SYA = new ToolStripButton("Удалить");
-            buttonDelete_SYA.Click += Delete_Click;
-
-            var buttonStatistics_SYA = new ToolStripButton("Статистика");
-            buttonStatistics_SYA.Click += Statistics_Click;
-
-            var buttonChart_SYA = new ToolStripButton("График");
-            buttonChart_SYA.Click += Chart_Click;
-
-            var buttonRefresh_SYA = new ToolStripButton("Обновить");
-            buttonRefresh_SYA.Click += Refresh_Click;
-
-            toolStripMain_SYA.Items.AddRange(new ToolStripItem[]
+            System.Windows.Forms.ToolStripButton Btn(string text, System.EventHandler h)
             {
-                buttonSearch_SYA,
-                new ToolStripSeparator(),
-                buttonAdd_SYA,
-                buttonEdit_SYA,
-                buttonDelete_SYA,
-                new ToolStripSeparator(),
-                buttonStatistics_SYA,
-                buttonChart_SYA,
-                new ToolStripSeparator(),
-                buttonRefresh_SYA
+                var b = new System.Windows.Forms.ToolStripButton(text);
+                b.AutoSize = false;
+                b.Size = new System.Drawing.Size(100, 32);
+                b.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+                b.Click += h;
+                return b;
+            }
+
+            toolStripTextBoxSearch_SYA.AutoSize = false;
+            toolStripTextBoxSearch_SYA.Width = 220;
+            toolStripTextBoxSearch_SYA.TextChanged += Search_TextChanged;
+
+            var clearBtn = Btn("✕", ClearSearch_Click);
+            clearBtn.Size = new System.Drawing.Size(40, 32);
+
+            toolStripMain_SYA.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
+            {
+                toolStripComboBoxTables_SYA,
+                new System.Windows.Forms.ToolStripSeparator(),
+                Btn("Добавить", Add_Click),
+                Btn("Изменить", Edit_Click),
+                Btn("Удалить", Delete_Click),
+                new System.Windows.Forms.ToolStripSeparator(),
+                Btn("Статистика", Statistics_Click),
+                Btn("График", Chart_Click),
+                new System.Windows.Forms.ToolStripSeparator(),
+                Btn("Обновить", Refresh_Click),
+                new System.Windows.Forms.ToolStripSeparator(),
+                new System.Windows.Forms.ToolStripLabel("Поиск:"),
+                toolStripTextBoxSearch_SYA,
+                clearBtn
             });
 
             // ===== GRID =====
-            dataGridViewEmployees_SYA.Dock = DockStyle.Fill;
+            dataGridViewEmployees_SYA.Dock = System.Windows.Forms.DockStyle.Fill;
             dataGridViewEmployees_SYA.ReadOnly = true;
-            dataGridViewEmployees_SYA.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridViewEmployees_SYA.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridViewEmployees_SYA.SelectionMode =
+                System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewEmployees_SYA.AutoSizeColumnsMode =
+                System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewEmployees_SYA.RowHeadersVisible = false;
 
             // ===== FORM =====
@@ -133,15 +139,9 @@
             Controls.Add(menuStripMain_SYA);
 
             MainMenuStrip = menuStripMain_SYA;
-            Text = "Отдел кадров — Вариант 11";
             ClientSize = new System.Drawing.Size(1000, 600);
-            StartPosition = FormStartPosition.CenterScreen;
-
-            ((System.ComponentModel.ISupportInitialize)dataGridViewEmployees_SYA).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "Отдел кадров — Вариант 11";
         }
-
-        #endregion
     }
 }

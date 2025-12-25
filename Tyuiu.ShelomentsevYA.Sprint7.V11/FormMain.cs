@@ -16,6 +16,7 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
 
         private DataTable table_SYA = new();
         private readonly Dictionary<string, string> csvFiles_SYA = new();
+        private readonly Dictionary<string, bool> sortAscending_SYA = new();
 
         private string currentPath_SYA = string.Empty;
         private bool isEditMode_SYA = false;
@@ -27,12 +28,20 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
             dataGridViewEmployees_SYA.AutoGenerateColumns = true;
             dataGridViewEmployees_SYA.DataSource = bindingSource_SYA;
 
-            ConfigureToolStrip();
+            dataGridViewEmployees_SYA.ColumnHeaderMouseClick +=
+                DataGridViewEmployees_SYA_ColumnHeaderMouseClick;
+
+            dataGridViewEmployees_SYA.DataBindingComplete +=
+                DataGridViewEmployees_SYA_DataBindingComplete;
+
+            ConfigureToolStrip();   
             ApplyIcons();
+
 
             Text = "Отдел кадров — Вариант 11";
             MinimumSize = new Size(1000, 600);
         }
+
 
         // ================= TOOLSTRIP =================
 
@@ -40,9 +49,11 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
         {
             toolStripMain_SYA.GripStyle = ToolStripGripStyle.Hidden;
             toolStripMain_SYA.AutoSize = false;
-            toolStripMain_SYA.Height = 42;
-            toolStripMain_SYA.Padding = new Padding(4, 2, 4, 2);
-            toolStripMain_SYA.ImageScalingSize = new Size(16, 16);
+            toolStripMain_SYA.Height = 48;
+            toolStripMain_SYA.Padding = new Padding(4, 4, 4, 4);
+            toolStripMain_SYA.ImageScalingSize = new Size(24, 24); // вместо 16,16
+
+
 
             foreach (ToolStripItem item in toolStripMain_SYA.Items)
             {
@@ -56,9 +67,11 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
                 btn.TextAlign = ContentAlignment.MiddleCenter;
 
                 btn.AutoSize = false;
-                btn.Size = new Size(110, 32);
-                btn.Margin = new Padding(2);
-                btn.Padding = new Padding(8, 0, 8, 0);
+                btn.Size = new Size(120, 38);
+                btn.Margin = new Padding(2, 1, 2, 1);
+                btn.Padding = new Padding(6, 0, 6, 0);
+
+
 
                 btn.ImageScaling = ToolStripItemImageScaling.None;
                 btn.ImageTransparentColor = Color.Magenta;
@@ -80,6 +93,7 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
                     "Статистика" => LoadIcon("chart_bar.png"),
                     "График" => LoadIcon("chart_line.png"),
                     "Обновить" => LoadIcon("arrow_refresh.png"),
+                    "Фильтр" => LoadIcon("magnifier.png"),
                     _ => null
                 };
             }
@@ -296,7 +310,15 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
                 table_SYA.DefaultView.RowFilter = string.Empty;
             }
         }
+        private void Filter_Click(object sender, EventArgs e)
+        {
+            using var f = new FormFilter_SYA(table_SYA);
+            if (f.ShowDialog() == DialogResult.OK)
+            {
+                table_SYA.DefaultView.RowFilter = f.ResultFilter;
+            }
 
+        }
 
         private void ClearSearch_Click(object sender, EventArgs e)
         {
@@ -385,5 +407,122 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11
 
             return true;
         }
+
+        // ================= SORTING =================
+
+        private void DataGridViewEmployees_SYA_ColumnHeaderMouseClick(
+            object sender,
+            DataGridViewCellMouseEventArgs e)
+        {
+            if (table_SYA == null || table_SYA.Rows.Count == 0)
+                return;
+
+            string columnName =
+                dataGridViewEmployees_SYA.Columns[e.ColumnIndex].Name;
+
+            bool asc = !sortAscending_SYA.ContainsKey(columnName)
+                       || !sortAscending_SYA[columnName];
+
+            sortAscending_SYA[columnName] = asc;
+            string direction = asc ? "ASC" : "DESC";
+
+            if (IsNumericColumn(table_SYA, columnName))
+            {
+                string sortColumn = EnsureNumericSortColumn(columnName);
+                table_SYA.DefaultView.Sort = $"[{sortColumn}] {direction}";
+            }
+            else
+            {
+                table_SYA.DefaultView.Sort = $"[{columnName}] {direction}";
+            }
+
+            UpdateSortGlyph(columnName, asc);
+        }
+
+
+        private bool IsNumericColumn(DataTable table, string columnName)
+        {
+            bool hasAnyValue = false;
+
+            foreach (DataRow row in table.Rows)
+            {
+                var value = row[columnName];
+                if (value == null || value == DBNull.Value)
+                    continue;
+
+                string s = value.ToString()?.Trim();
+                if (string.IsNullOrEmpty(s))
+                    continue;
+
+                hasAnyValue = true;
+
+                if (!double.TryParse(s, out _))
+                    return false;
+            }
+
+            return hasAnyValue;
+        }
+
+
+        private string EnsureNumericSortColumn(string columnName)
+        {
+            string numericColumnName = $"__NUM_{columnName}";
+
+            if (!table_SYA.Columns.Contains(numericColumnName))
+            {
+                table_SYA.Columns.Add(numericColumnName, typeof(double));
+            }
+
+            foreach (DataRow row in table_SYA.Rows)
+            {
+                var value = row[columnName];
+
+                if (value == null || value == DBNull.Value)
+                {
+                    row[numericColumnName] = double.MinValue;
+                    continue;
+                }
+
+                string s = value.ToString()?.Trim();
+
+                if (double.TryParse(s, out double number))
+                    row[numericColumnName] = number;
+                else
+                    row[numericColumnName] = double.MinValue;
+            }
+
+            return numericColumnName;
+        }
+
+
+        private void UpdateSortGlyph(string sortedColumn, bool asc)
+        {
+            foreach (DataGridViewColumn col in dataGridViewEmployees_SYA.Columns)
+            {
+                col.HeaderCell.SortGlyphDirection =
+                    col.Name == sortedColumn
+                        ? (asc ? SortOrder.Ascending : SortOrder.Descending)
+                        : SortOrder.None;
+            }
+        }
+
+        private void DataGridViewEmployees_SYA_DataBindingComplete(
+    object sender,
+    DataGridViewBindingCompleteEventArgs e)
+        {
+            foreach (DataGridViewColumn col in dataGridViewEmployees_SYA.Columns)
+            {
+                col.SortMode = DataGridViewColumnSortMode.Programmatic;
+
+                if (col.Name.StartsWith("__NUM_"))
+                {
+                    col.Visible = false;
+                }
+            }
+        }
+
+
+
+
     }
 }

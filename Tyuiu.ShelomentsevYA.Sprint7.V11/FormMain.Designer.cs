@@ -118,6 +118,7 @@
                 Btn("График", Chart_Click),
                 new System.Windows.Forms.ToolStripSeparator(),
                 Btn("Обновить", Refresh_Click),
+                Btn("Фильтр", Filter_Click),
                 new System.Windows.Forms.ToolStripSeparator(),
                 new System.Windows.Forms.ToolStripLabel("Поиск:"),
                 toolStripTextBoxSearch_SYA,

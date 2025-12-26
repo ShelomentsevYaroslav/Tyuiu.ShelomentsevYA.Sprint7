@@ -89,6 +89,9 @@
             toolStripMain_SYA.AutoSize = false;
             toolStripMain_SYA.Height = 46;
 
+            toolStripMain_SYA.ShowItemToolTips = true;
+            
+
             System.Windows.Forms.ToolStripButton Btn(string text, System.EventHandler h)
             {
                 var b = new System.Windows.Forms.ToolStripButton(text);
@@ -124,6 +127,7 @@
                 toolStripTextBoxSearch_SYA,
                 clearBtn
             });
+
 
             // ===== GRID =====
             dataGridViewEmployees_SYA.Dock = System.Windows.Forms.DockStyle.Fill;

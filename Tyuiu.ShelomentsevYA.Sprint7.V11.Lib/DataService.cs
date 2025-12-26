@@ -16,7 +16,7 @@ namespace Tyuiu.ShelomentsevYA.Sprint7.V11.Lib
 
             if (!File.Exists(path))
                 return table;
-
+                
             var lines = File.ReadAllLines(path);
             if (lines.Length == 0)
                 return table;
